@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador: assistente de WhatsApp da Naturale EstÃ©tica AvanÃ§ada</title>
+<meta name="description" content="DemonstraÃ§Ã£o do assistente virtual de WhatsApp da Naturale EstÃ©tica AvanÃ§ada, em FlorianÃ³polis e Tijucas.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d0d;--surface:#1a1a1a;--border:#2a2a2a;
+  --rose:#c9847a;--rose-light:#e8a89f;--rose-muted:#7a4f4b;
+  --text:#f0ede8;--muted:#888;--ink:#1a1a1a;
+  --wa-bg:#1a1210;--wa-me:#3d2420;--wa-them:#242424;--wa-head:#1e1410;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Inter",system-ui,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:400 1rem/1.55 var(--sans)}
+:focus-visible{outline:2px solid var(--rose);outline-offset:2px;border-radius:4px}
+
+.page{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,40px);display:grid;grid-template-columns:1fr 400px 1fr;gap:clamp(20px,3vw,40px);align-items:start;min-height:100%}
+
+/* LEFT */
+.left{padding-top:8px}
+.badge{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--rose-muted);color:var(--rose-light);border-radius:999px;padding:3px 12px;margin-bottom:18px}
+.left h1{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:500;line-height:1.2;margin:0 0 16px;color:var(--text)}
+.left p{font-size:.95rem;color:var(--muted);margin:0 0 20px;line-height:1.6}
+.left ul{list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px}
+.left ul li{font-size:.88rem;color:var(--muted);padding-left:20px;position:relative}
+.left ul li::before{content:"â¦";position:absolute;left:0;color:var(--rose);font-size:.7rem;top:3px}
+.try{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.try h3{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.try-btn{display:block;width:100%;text-align:left;background:none;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem;color:var(--text);cursor:pointer;margin-bottom:6px;transition:border-color .2s,background .2s}
+.try-btn:hover{border-color:var(--rose-muted);background:rgba(201,132,122,.08)}
+.try-btn:last-child{margin-bottom:0}
+
+/* PHONE */
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
+.phone{background:#111;border-radius:36px;padding:14px;box-shadow:0 24px 60px rgba(0,0,0,.6),inset 0 0 0 1px #333;width:100%;max-width:400px}
+.wa-frame{background:var(--wa-bg);border-radius:24px;overflow:hidden;display:flex;flex-direction:column;height:560px}
+.wa-head{background:var(--wa-head);padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2a1e1a}
+.wa-avatar{width:38px;height:38px;border-radius:50%;background:var(--rose-muted);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.1rem;color:var(--rose-light);font-weight:600;flex-shrink:0}
+.wa-info{flex:1;min-width:0}
+.wa-name{font-weight:600;font-size:.9rem;color:#fff}
+.wa-status{font-size:.75rem;color:#a0907a}
+.wa-restart{background:none;border:1px solid #3a2a25;border-radius:6px;padding:4px 10px;font-size:.75rem;color:#a0907a;cursor:pointer;transition:border-color .2s,color .2s}
+.wa-restart:hover{border-color:var(--rose-muted);color:var(--rose-light)}
+#chat{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth}
+#chat::-webkit-scrollbar{width:3px}
+#chat::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px}
+.day{text-align:center;margin:6px 0}
+.day span{background:#1e1e1e;color:#666;font-size:.72rem;padding:3px 10px;border-radius:10px}
+.msg{max-width:82%;padding:8px 12px;border-radius:12px;font-size:.88rem;line-height:1.5;word-break:break-word;position:relative}
+.msg time{display:block;font-size:.68rem;margin-top:3px;opacity:.6;text-align:right}
+.msg.them{background:var(--wa-them);color:#e8e0d8;border-bottom-left-radius:3px;align-self:flex-start}
+.msg.me{background:var(--wa-me);color:#e8d8d0;border-bottom-right-radius:3px;align-self:flex-end}
+.typing{background:var(--wa-them);border-radius:12px;border-bottom-left-radius:3px;padding:10px 14px;align-self:flex-start;display:none}
+.typing i{display:inline-block;width:6px;height:6px;background:#888;border-radius:50%;animation:bounce .9s infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+#chips{padding:6px 12px;display:flex;flex-wrap:wrap;gap:6px;min-height:36px}
+.chip{background:none;border:1px solid var(--rose-muted);border-radius:999px;padding:5px 14px;font-size:.8rem;color:var(--rose-light);cursor:pointer;transition:background .2s,border-color .2s}
+.chip:hover{background:rgba(201,132,122,.15);border-color:var(--rose-light)}
+.wa-input{border-top:1px solid #2a1e1a;padding:10px 14px;display:flex;gap:8px;align-items:center;background:var(--wa-head)}
+#text{flex:1;background:#1e1818;border:1px solid #2a2020;border-radius:22px;padding:9px 14px;font-size:.88rem;color:var(--text);outline:none;font-family:var(--sans)}
+#text::placeholder{color:#554040}
+#text:focus{border-color:var(--rose-muted)}
+#send{width:38px;height:38px;border-radius:50%;background:var(--rose);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+#send:hover{background:var(--rose-light)}
+#send svg{width:16px;height:16px;fill:#fff}
+
+/* RIGHT / PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px 22px}
+.panel h2{font-family:var(--serif);font-size:1.15rem;font-weight:500;margin:0 0 4px;color:var(--text)}
+.panel>.sub{font-size:.82rem;color:var(--muted);margin:0 0 20px;line-height:1.4}
+.panel dl{margin:0;display:flex;flex-direction:column;gap:14px}
+.panel dt{font-size:.75rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.panel dd{margin:0;font-size:.9rem;color:var(--rose-light);font-weight:500;min-height:18px}
+.panel dd.empty{color:#444;font-weight:400}
+.status-box{margin-top:20px;background:#111;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+#status{font-size:.82rem;font-weight:600;color:var(--rose-light)}
+.ai-note{font-size:.75rem;color:var(--muted);margin-top:6px;line-height:1.4}
+.foot{font-size:.72rem;color:#444;text-align:center;margin-top:14px;line-height:1.5}
+
+@media(max-width:900px){
+  .page{grid-template-columns:1fr;max-width:500px}
+  .left,.panel{order:2}
+  .phone-wrap{order:1}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="badge">DemonstraÃ§Ã£o</div>
+    <h1>Suas clientes atendidas<br>na hora, no WhatsApp</h1>
+    <p>Converse como se fosse uma cliente. O assistente responde com as informaÃ§Ãµes da Naturale, entende o que a pessoa busca e deixa o pedido de agendamento pronto para vocÃª confirmar.</p>
+    <ul>
+      <li>Responde 24 horas, inclusive fora do horÃ¡rio da clÃ­nica</li>
+      <li>Diferencia protocolo facial, corporal e de pele</li>
+      <li>Informa sobre FlorianÃ³polis e Tijucas</li>
+      <li>NÃ£o faz diagnÃ³stico nem promete resultado</li>
+      <li>Chama vocÃª na hora em casos urgentes</li>
+    </ul>
+    <div class="try">
+      <h3>Experimente perguntar</h3>
+      <button class="try-btn" onclick="user(this.textContent)">Quanto custa o botox?</button>
+      <button class="try-btn" onclick="user(this.textContent)">Quero fazer lÃ¡bios em Tijucas</button>
+      <button class="try-btn" onclick="user(this.textContent)">Tenho 50 anos, quero rejuvenescer</button>
+    </div>
+  </div>
+
+  <!-- PHONE -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="wa-frame">
+        <div class="wa-head">
+          <div class="wa-avatar">N</div>
+          <div class="wa-info">
+            <div class="wa-name">Naturale EstÃ©tica</div>
+            <div class="wa-status">Assistente virtual, online</div>
+          </div>
+          <button class="wa-restart" onclick="start()">RecomeÃ§ar</button>
+        </div>
+        <div id="chat"></div>
+        <div id="chips"></div>
+        <div class="wa-input">
+          <input id="text" type="text" placeholder="Digite uma mensagem" autocomplete="off" onkeydown="if(event.key==='Enter')send()">
+          <button id="send" onclick="send()" aria-label="Enviar">
+            <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <p class="foot">SimulaÃ§Ã£o criada pela Push IA. As respostas usam informaÃ§Ãµes pÃºblicas da Naturale EstÃ©tica AvanÃ§ada.</p>
+  </div>
+
+  <!-- RIGHT / PANEL -->
+  <aside class="panel" aria-label="Resumo que chega para a equipe">
+    <h2>O que vocÃªs recebem</h2>
+    <p class="sub">Enquanto a cliente conversa, este resumo Ã© montado automaticamente.</p>
+    <dl>
+      <dt>Interesse</dt><dd id="l-interesse" class="empty">aguardando</dd>
+      <dt>Unidade preferida</dt><dd id="l-unidade" class="empty">aguardando</dd>
+      <dt>DÃºvidas que a cliente tirou</dt><dd id="l-duvidas" class="empty">nenhuma ainda</dd>
+      <dt>Nome</dt><dd id="l-nome" class="empty">aguardando</dd>
+      <dt>Melhor perÃ­odo</dt><dd id="l-periodo" class="empty">aguardando</dd>
+    </dl>
+    <div class="status-box">
+      <div id="status">Conversa em andamento</div>
+      <p class="ai-note">Modo demonstraÃ§Ã£o: nenhuma mensagem Ã© enviada de verdade.</p>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+var CLINICA={
+  nome:"Naturale EstÃ©tica AvanÃ§ada",
+  whats:"5548999566821",
+  end:"Rua Belmira Isabel Martins, 62, sala 212, Estreito, FlorianÃ³polis, SC",
+  horario:"TerÃ§a a sexta 09hâ19h, sÃ¡bado 09hâ12h",
+  ig:"@naturaleclinicaestetica",
+  nota:"4,5 em 116 avaliaÃ§Ãµes no Google"
+};
+
+var PROT={
+  botox:{nome:"Botox",txt:"O botox fica para suavizar linhas de expressÃ£o com naturalidade. O planejamento Ã© feito na avaliaÃ§Ã£o â a Naturale trabalha com resultado sutil e equilibrado. Me conta: para o rosto todo, testa ou ao redor dos olhos?"},
+  labios:{nome:"LÃ¡bios",txt:"Protocolos de lÃ¡bios com foco em contorno, hidrataÃ§Ã£o e equilÃ­brio facial. Nada que pareÃ§a exagerado â a proposta da Naturale Ã© naturalidade. VocÃª quer mais definiÃ§Ã£o, volume ou hidrataÃ§Ã£o?"},
+  fullface:{nome:"Full face",txt:"O full face Ã© uma leitura global do rosto, combinando recursos de forma estratÃ©gica. Ideal para quem quer uma melhora geral sem parecer que 'fez algo'. Na avaliaÃ§Ã£o eles definem o que faz mais sentido para vocÃª."},
+  skin:{nome:"Skin booster",txt:"Skin booster cuida da qualidade da pele: hidrataÃ§Ã£o, viÃ§o e textura. Quando hÃ¡ indicaÃ§Ã£o, faz uma diferenÃ§a visÃ­vel na aparÃªncia da pele. VocÃª tem alguma queixa especÃ­fica, como ressecamento ou opacidade?"},
+  bio:{nome:"Bioestimulador",txt:"Bioestimuladores estimulam progressivamente a produÃ§Ã£o de colÃ¡geno e melhoram a firmeza. O resultado aparece ao longo das semanas. Me conta: a preocupaÃ§Ã£o Ã© mais flacidez ou volume?"},
+  corporal:{nome:"GlÃºteos e corporal",txt:"O atendimento corporal parte de avaliaÃ§Ã£o e expectativa realista. GlÃºteos, modelagem, reduÃ§Ã£o de gordura â tudo com protocolo personalizado. Qual Ã© o seu objetivo principal?"},
+};
+
+var S={trat:null,unidade:null,duvidas:[],step:"menu",nome:null,est:false};
+var chat=document.getElementById("chat"),chipsEl=document.getElementById("chips"),input=document.getElementById("text");
+var s=null,sample=null,hist=[];
+
+function low(n){return n.charAt(0).toLowerCase()+n.slice(1);}
+function now(){var d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+function scroll(){chat.scrollTop=chat.scrollHeight;}
+
+function add(txt,who){
+  var m=document.createElement("div");m.className="msg "+who;
+  m.textContent=txt;
+  var t=document.createElement("time");t.textContent=now();m.appendChild(t);
+  chat.appendChild(m);scroll();
+}
+
+function chips(list){
+  chipsEl.innerHTML="";
+  (list||[]).forEach(function(c){
+    var b=document.createElement("button");b.type="button";b.className="chip";
+    b.textContent=c[0];b.onclick=function(){user(c[0],c[1]);};
+    chipsEl.appendChild(b);
+  });
+}
+
+function set(id,val){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=val;
+  el.classList.toggle("empty",!val||val==="aguardando"||val==="nenhuma ainda");
+}
+
+function duvida(d){if(S.duvidas.indexOf(d)<0){S.duvidas.push(d);set("l-duvidas",S.duvidas.join(", "));}}
+function status(txt,cls){var s=document.getElementById("status");s.textContent=txt;s.className=cls||"";}
+
+var MENU=function(){return[
+  ["Botox","t:botox"],["LÃ¡bios","t:labios"],["Full face","t:fullface"],
+  ["Skin booster","t:skin"],["Bioestimulador","t:bio"],["Corporal / glÃºteos","t:corporal"],
+  ["Agendar avaliaÃ§Ã£o","agendar"]
+];};
+
+var FOLLOW=function(){return[
+  ["Quanto custa?","q:preco"],["Quando tenho resultado?","q:resultado"],
+  ["Preciso de mais de uma sessÃ£o?","q:sessoes"],["Quero agendar","agendar"]
+];};
+
+function start(){
+  S={trat:null,unidade:null,duvidas:[],step:"menu",nome:null,est:false};
+  hist=[];
+  chat.innerHTML='<div class="day"><span>Hoje</span></div>';
+  set("l-interesse","aguardando");set("l-unidade","aguardando");set("l-duvidas","nenhuma ainda");
+  set("l-nome","aguardando");set("l-periodo","aguardando");
+  status("Conversa em andamento");
+  bot(["OlÃ¡! â¨ Aqui Ã© o assistente virtual da Naturale EstÃ©tica AvanÃ§ada.","O que vocÃª gostaria de realÃ§ar?"],MENU());
+}
+
+function setTrat(t){
+  S.trat=t;
+  set("l-interesse",PROT[t].nome);
+  if(S.step!=="desc"){S.step="desc";}
+  duvida("como funciona");
+  var next=S.unidade?FOLLOW():[["FlorianÃ³polis","u:floripa"],["Tijucas","u:tijucas"],["Qualquer uma","u:qualquer"]];
+  bot([PROT[t].txt,"A consulta seria em FlorianÃ³polis ou Tijucas?"],next);
+}
+
+function setUnidade(u){
+  S.unidade=u;
+  var label=u==="floripa"?"FlorianÃ³polis":u==="tijucas"?"Tijucas":"Qualquer uma";
+  set("l-unidade",label);
+  duvida("unidade");
+  bot([
+    "Anotei, "+label+"! Alguma dÃºvida antes de agendar?",
+    S.trat?"A indicaÃ§Ã£o exata do protocolo Ã© definida na avaliaÃ§Ã£o â mas jÃ¡ consigo deixar seu pedido pronto para a equipe confirmar.":""
+  ].filter(Boolean),FOLLOW());
+}
+
+function agendar(){S.step="nome";bot(["Ãtimo! Para deixar sua avaliaÃ§Ã£o encaminhada, qual Ã© o seu nome?"]);}
+
+function answer(q){
+  if(q==="preco"){
+    duvida("valor");
+    bot(["O valor Ã© definido na avaliaÃ§Ã£o, conforme o protocolo indicado para o seu caso. A Naturale nÃ£o passa preÃ§o por mensagem â mas na avaliaÃ§Ã£o vocÃª recebe o plano detalhado e o investimento."],FOLLOW());
+  }else if(q==="resultado"){
+    duvida("resultado");
+    bot(["Depende do protocolo. Botox e lÃ¡bios tÃªm resultado em dias; bioestimuladores constroem ao longo de semanas. Na avaliaÃ§Ã£o eles explicam o que esperar e em que prazo."],FOLLOW());
+  }else if(q==="sessoes"){
+    duvida("sessÃµes");
+    bot(["Alguns protocolos sÃ£o de sessÃ£o Ãºnica, outros tÃªm sequÃªncia recomendada. Tudo depende do seu objetivo e do que a equipe indicar na avaliaÃ§Ã£o."],FOLLOW());
+  }
+}
+
+function nome(n){
+  S.nome=n.trim().split(/\s+/).slice(0,2).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(" ");
+  set("l-nome",S.nome);
+  S.step="periodo";
+  bot(["Prazer, "+S.nome.split(" ")[0]+"! Qual Ã© o melhor perÃ­odo para vocÃª â manhÃ£ ou tarde?"],[["ManhÃ£","p:manhÃ£"],["Tarde","p:tarde"],["Qualquer horÃ¡rio","p:qualquer"]]);
+}
+
+function periodo(p){
+  set("l-periodo",p);S.step="fim";S.est=true;
+  status("Pedido de avaliaÃ§Ã£o pronto","ready");
+  var u=S.unidade==="floripa"?"FlorianÃ³polis":S.unidade==="tijucas"?"Tijucas":"qualquer unidade";
+  var t=S.trat?low(PROT[S.trat].nome):"avaliaÃ§Ã£o";
+  bot([
+    "Pronto, "+S.nome.split(" ")[0]+"! Pedi uma avaliaÃ§Ã£o de "+t+" em "+u+", no perÃ­odo da "+p.toLowerCase()+".",
+    "A equipe da Naturale vai confirmar com vocÃª. ð¿",
+    "Quer saber mais alguma coisa?"
+  ],[["Ver outros protocolos","menu"],["Encerrar","tchau"]]);
+}
+
+function human(){status("Encaminhado para a equipe","human");}
+
+function route(v){
+  if(v.indexOf("t:")==0)return setTrat(v.slice(2));
+  if(v.indexOf("u:")==0)return setUnidade(v.slice(2));
+  if(v.indexOf("q:")==0)return answer(v.slice(2));
+  if(v.indexOf("p:")==0)return periodo(v.slice(2));
+  if(v==="agendar")return agendar();
+  if(v==="menu")return bot(["Claro! Sobre o que vocÃª quer conversar?"],MENU());
+  if(v==="tchau")return bot(["Foi um prazer! AtÃ© breve. ð¿"],[["RecomeÃ§ar","reset"]]);
+  if(v==="reset"){start();}
+}
+
+function norm(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+
+function intent(t){
+  t=norm(t);
+  if(/dor|urgente|emergencia|urgent/.test(t))return "human";
+  if(/labio|labios|bico|preenchimento labial/.test(t))return "t:labios";
+  if(/botox|testa|fronte|expressao|rugas|ruga/.test(t))return "t:botox";
+  if(/full.?face|rosto todo|facial completo/.test(t))return "t:fullface";
+  if(/skin.?booster|hidrat|pele opaca|ressec|viÃ§o/.test(t))return "t:skin";
+  if(/bioestimulador|colageno|firmeza|flacidez|biorevi/.test(t))return "t:bio";
+  if(/gluteo|corporal|gordura|celulite|emagre|body/.test(t))return "t:corporal";
+  if(/tijucas/.test(t))return "u:tijucas";
+  if(/florianopolis|floripa|estreito/.test(t))return "u:floripa";
+  if(/preco|valor|custa|quanto/.test(t))return "q:preco";
+  if(/resultado|quando|tempo|semana|dia/.test(t))return "q:resultado";
+  if(/sessao|sessoes|vezes|quantas/.test(t))return "q:sessoes";
+  if(/agendar|marcar|consulta|avaliacao/.test(t))return "agendar";
+  if(/onde|endereco|fica|local|acess/.test(t))return "info";
+  if(/^(oi|ola|bom dia|boa tarde|boa noite)/.test(t))return "oi";
+  return null;
+}
+
+function free(txt){
+  if(S.step==="desc"){
+    S.step="nome";
+    var n=txt.trim().split(/\s+/).slice(0,2).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(" ");
+    if(n.length>2&&n.length<30&&!/[0-9@]/.test(n)){
+      set("l-nome",n);S.nome=n;S.step="periodo";
+      bot(["Prazer, "+n.split(" ")[0]+"! Qual perÃ­odo fica melhor?"],[["ManhÃ£","p:manhÃ£"],["Tarde","p:tarde"],["Qualquer horÃ¡rio","p:qualquer"]]);
+      return;
+    }
+  }
+  if(S.step==="nome"){nome(txt);return;}
+  var it=intent(txt);
+  if(it==="human"){human();}
+  else if(it==="info"){
+    duvida("endereÃ§o");
+    bot(["ð FlorianÃ³polis: "+CLINICA.end+".\nHorÃ¡rio: "+CLINICA.horario+".\nTijucas: confirme endereÃ§o e disponibilidade pelo WhatsApp antes de ir."],FOLLOW());
+  }
+  else if(it==="oi"){bot(["OlÃ¡! ð Me conta como posso te ajudar."],MENU());}
+  else if(it){route(it);}
+  else if(s){return askAI(txt);}
+  else{bot(["Essa pergunta eu vou deixar para a equipe responder, para nÃ£o passar nada errado. Enquanto isso, posso te ajudar com:"],MENU());}
+}
+
+function user(txt,val){
+  chips([]);add(txt,"me");hist.push({role:"user",content:txt});
+  if(val)route(val);else free(txt);
+}
+
+function send(){var t=input.value.trim();if(!t)return;input.value="";user(t);}
+
+function prompt(){
+  return [{role:"user",content:"VocÃª Ã© a assistente virtual de WhatsApp da Naturale EstÃ©tica AvanÃ§ada (slogan: naturalidade e ciÃªncia). ClÃ­nica de estÃ©tica avanÃ§ada em FlorianÃ³polis (Estreito) e Tijucas. Protocolos: Botox, LÃ¡bios, Full Face, Skin Booster, Bioestimuladores, Corporal/GlÃºteos. WhatsApp (48) 99956-6821. Responda em portuguÃªs do Brasil, tom caloroso, mÃ¡ximo 2 frases curtas. NÃ£o invente preÃ§o nem prometa resultado. NÃ£o faÃ§a diagnÃ³stico."}];
+}
+
+function askAI(){
+  var ty=document.createElement("div");ty.className="typing";
+  ty.innerHTML="<i></i><i></i><i></i>";chat.appendChild(ty);ty.style.display="flex";scroll();
+  var msgs=prompt().concat(hist);
+  sample(msgs,{modelTier:"quick",cache:false}).then(function(r){
+    ty.remove();var t=r.text.trim();add(t,"them");hist.push({role:"assistant",content:t});chips(FOLLOW());scroll();
+  }).catch(function(){ty.remove();bot(["Essa pergunta eu passo para a equipe responder direitinho. Posso te ajudar com mais alguma coisa?"],MENU());});
+}
+
+function bot(msgs,chipList){
+  var ty=document.createElement("div");ty.className="typing";
+  ty.innerHTML="<i></i><i></i><i></i>";chat.appendChild(ty);ty.style.display="flex";scroll();
+  var delay=600;
+  msgs.forEach(function(m,i){
+    setTimeout(function(){
+      if(i===0)ty.remove();
+      if(m)add(m,"them");
+      if(i===msgs.length-1)chips(chipList||[]);
+      scroll();
+    },delay*(i+1));
+  });
+}
+
+start();
+</script>
+</body>
+</html>
